@@ -1,38 +1,191 @@
-.App {
-  text-align: center;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f3f4f6;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+nav {
+  background-color: #4f46e5;
+  color: white;
+  padding: 15px 40px;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+nav a {
+  color: white;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  padding: 20px;
+}
+
+.button {
+  padding: 25px 50px;       /* bigger button */
+  font-size: 30px;          /* larger text */
+  border-radius: 12px;      /* rounder corners */
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* subtle shadow */
+}
+
+.green {
+  background-color: #10b981;
+  color: black;
+}
+
+.red {
+  background-color: #ef4444;
+  color: black;
+}
+
+.button:hover {
+  transform: scale(1.1); /* slightly enlarge on hover */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3); /* stronger shadow */
+}
+
+.listening-animation {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+  50% { transform: scale(1.2); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+  100% { transform: scale(1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+}
+
+.green {
+  background-color: #10b981;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.red {
+  background-color: #ef4444;
+  color: white;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.flex {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  margin: 0; /* remove default margin */
+  padding: 0; /* remove default padding */
+}
+
+
+.card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 500px;
+}
+footer.footer {
+  background: linear-gradient(45deg, #ffe6f0, #d1c4ff, #a0f0f0, #fff7a8); /* lighter colors */
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+  color: #111; /* dark text for contrast */
+  padding: 60px 40px; /* big padding */
+  text-align: center;
+  border-radius: 10px;
+  margin-top: 0;
+}
+
+footer.footer .footer-container {
+  background-color: rgba(255, 255, 255, 0.5); /* transparent white container */
+  padding: 45px; /* big padding */
+  border-radius: 12px;
+  display: inline-block;
+}
+
+footer.footer p, footer.footer .footer-links a {
+  font-weight: bold;
+  font-size: 54px; /* large text */
+  color: #111; /* dark text */
+  margin: 15px 20px;
+  text-decoration: none;
+}
+
+footer.footer .footer-links a:hover {
+  text-decoration: underline;
+}
+footer.footer .footer-container {
+  background-color: rgba(0, 0, 0, 0.3); /* transparent container */
+  padding: 45px; /* triple original padding */
+  border-radius: 12px;
+  display: inline-block;
+}
+
+/* Paragraph text (smaller) */
+footer.footer p {
+  font-family: 'Verdana', 'Arial', sans-serif;
+  font-weight: 900;
+  font-size: 28px; /* smaller than before */
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  margin: 15px 20px;
+}
+
+/* Links text (still large) */
+footer.footer .footer-links a {
+  font-family: 'Verdana', 'Arial', sans-serif;
+  font-weight: 900;
+  font-size: 54px; /* keep links big */
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  margin: 15px 20px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+footer.footer .footer-links a:hover {
+  transform: scale(1.1);
+  text-decoration: underline;
+  color: #333;
+}
+
+
+footer.footer .footer-links a:hover {
+  transform: scale(1.1); /* slight zoom on hover */
+  text-decoration: underline;
+  color: #333; /* darker on hover */
+}
+
+footer.footer .footer-links a:hover {
+  text-decoration: underline;
+}
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
