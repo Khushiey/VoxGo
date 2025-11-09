@@ -17,6 +17,7 @@ export default function Navbar() {
         zIndex: 100,
         boxShadow: "0 2px 16px rgba(67,233,123,0.15)",
         fontFamily: "'Montserrat', 'Segoe UI', Arial, sans-serif",
+        flexWrap: "wrap", // ✅ helps small screens adjust
       }}
     >
       <div
@@ -27,75 +28,45 @@ export default function Navbar() {
           letterSpacing: "4px",
           textShadow: "0 2px 12px #43e97b",
           marginLeft: "40px",
+          flex: "1",
+          textAlign: "left",
         }}
       >
         🚀 VoxGo
       </div>
+
       <div
         className="nav-links"
         style={{
           display: "flex",
+          flexWrap: "wrap",
           gap: "2vw",
           marginRight: "40px",
+          justifyContent: "flex-end",
+          flex: "1",
         }}
       >
         <Link
           to="/"
-          style={{
-            color: "#fff",
-            fontSize: "1vw",
-            fontWeight: 500,
-            textDecoration: "none",
-            padding: "0.5vw 1vw",
-            borderRadius: "8px",
-            transition: "background 0.2s, color 0.2s",
-            background: "rgba(67,233,123,0.08)",
-          }}
+          style={linkStyle}
         >
           Home
         </Link>
         <Link
           to="/location"
-          style={{
-            color: "#fff",
-            fontSize: "1vw",
-            fontWeight: 500,
-            textDecoration: "none",
-            padding: "0.5vw 1vw",
-            borderRadius: "8px",
-            transition: "background 0.2s, color 0.2s",
-            background: "rgba(67,233,123,0.08)",
-          }}
+          style={linkStyle}
         >
           Location
         </Link>
         <Link
           to="/translator"
-          style={{
-            color: "#fff",
-            fontSize: "1vw",
-            fontWeight: 500,
-            textDecoration: "none",
-            padding: "0.5vw 1vw",
-            borderRadius: "8px",
-            transition: "background 0.2s, color 0.2s",
-            background: "rgba(67,233,123,0.08)",
-          }}
+          style={linkStyle}
         >
           Translator
         </Link>
         <Link
           to="/qa"
-          style={{
-            color: "#fff",
-            fontSize: "1vw",
-            fontWeight: 500,
-            textDecoration: "none",
-            padding: "0.5vw 1vw",
-            borderRadius: "8px",
-            transition: "background 0.2s, color 0.2s",
-            background: "rgba(67,233,123,0.08)",
-          }}
+          style={linkStyle}
         >
           Q/A
         </Link>
@@ -110,7 +81,7 @@ export default function Navbar() {
             color: #222 !important;
           }
 
-          /* ✅ Responsive Styles */
+          /* ✅ Medium devices (tablets) */
           @media (max-width: 1024px) {
             nav {
               padding: 14px 0;
@@ -128,44 +99,67 @@ export default function Navbar() {
             }
           }
 
+          /* ✅ Small tablets & large phones */
           @media (max-width: 768px) {
             nav {
               flex-direction: column;
+              align-items: center;
               padding: 12px 0;
             }
             nav div:first-child {
               font-size: 5vw;
-              margin-left: 0;
-              margin-bottom: 10px;
+              margin: 0 0 10px 0;
+              text-align: center;
             }
             .nav-links {
-              flex-wrap: wrap;
               justify-content: center;
               gap: 4vw;
               margin: 0;
+              flex-wrap: wrap;
             }
             nav a {
               font-size: 3.5vw !important;
-              padding: 1vw 3vw;
+              padding: 1.5vw 3.5vw;
             }
           }
 
+          /* ✅ Android & small phones (up to 480px) */
           @media (max-width: 480px) {
             nav {
+              flex-direction: column;
+              justify-content: center;
               padding: 10px 0;
             }
             nav div:first-child {
               font-size: 6vw;
-              margin-bottom: 8px;
+              margin-bottom: 10px;
+              text-align: center;
             }
             .nav-links {
               flex-direction: column;
               align-items: center;
               gap: 10px;
+              margin: 0;
+              width: 100%;
             }
             nav a {
-              font-size: 4vw !important;
-              padding: 2vw 4vw;
+              font-size: 4.2vw !important;
+              padding: 2.5vw 6vw;
+              width: 70%;
+              text-align: center;
+              background: rgba(67,233,123,0.12);
+              border-radius: 10px;
+            }
+          }
+
+          /* ✅ Ultra-small devices (320px–360px width) */
+          @media (max-width: 360px) {
+            nav div:first-child {
+              font-size: 6.5vw;
+            }
+            nav a {
+              font-size: 4.6vw !important;
+              padding: 3vw 5vw;
             }
           }
         `}
@@ -173,3 +167,14 @@ export default function Navbar() {
     </nav>
   );
 }
+
+const linkStyle = {
+  color: "#fff",
+  fontSize: "1vw",
+  fontWeight: 500,
+  textDecoration: "none",
+  padding: "0.5vw 1vw",
+  borderRadius: "8px",
+  transition: "background 0.2s, color 0.2s",
+  background: "rgba(67,233,123,0.08)",
+};
