@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav
       style={{
@@ -17,9 +19,10 @@ export default function Navbar() {
         zIndex: 100,
         boxShadow: "0 2px 16px rgba(67,233,123,0.15)",
         fontFamily: "'Montserrat', 'Segoe UI', Arial, sans-serif",
-        flexWrap: "wrap", // ✅ helps small screens adjust
+        flexWrap: "wrap",
       }}
     >
+      {/* Logo */}
       <div
         style={{
           fontWeight: "bold",
@@ -28,46 +31,70 @@ export default function Navbar() {
           letterSpacing: "4px",
           textShadow: "0 2px 12px #43e97b",
           marginLeft: "40px",
-          flex: "1",
-          textAlign: "left",
         }}
       >
         🚀 VoxGo
       </div>
 
+      {/* Hamburger Button (mobile only) */}
       <div
-        className="nav-links"
+        className="hamburger"
+        onClick={() => setMenuOpen(!menuOpen)}
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "2vw",
-          marginRight: "40px",
-          justifyContent: "flex-end",
-          flex: "1",
+          display: "none",
+          flexDirection: "column",
+          cursor: "pointer",
+          marginRight: "25px",
+          gap: "6px",
         }}
       >
-        <Link
-          to="/"
-          style={linkStyle}
-        >
+        <div
+          style={{
+            width: "28px",
+            height: "3px",
+            background: "#43e97b",
+            borderRadius: "2px",
+          }}
+        ></div>
+        <div
+          style={{
+            width: "28px",
+            height: "3px",
+            background: "#43e97b",
+            borderRadius: "2px",
+          }}
+        ></div>
+        <div
+          style={{
+            width: "28px",
+            height: "3px",
+            background: "#43e97b",
+            borderRadius: "2px",
+          }}
+        ></div>
+      </div>
+
+      {/* Navigation Links */}
+      <div
+        className={`nav-links ${menuOpen ? "open" : ""}`}
+        style={{
+          display: "flex",
+          gap: "2vw",
+          marginRight: "40px",
+          alignItems: "center",
+          transition: "all 0.3s ease-in-out",
+        }}
+      >
+        <Link to="/" style={linkStyle}>
           Home
         </Link>
-        <Link
-          to="/location"
-          style={linkStyle}
-        >
+        <Link to="/location" style={linkStyle}>
           Location
         </Link>
-        <Link
-          to="/translator"
-          style={linkStyle}
-        >
+        <Link to="/translator" style={linkStyle}>
           Translator
         </Link>
-        <Link
-          to="/qa"
-          style={linkStyle}
-        >
+        <Link to="/qa" style={linkStyle}>
           Q/A
         </Link>
       </div>
@@ -75,73 +102,63 @@ export default function Navbar() {
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&display=swap');
-          
+
           nav a:hover {
             background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
             color: #222 !important;
           }
 
-          /* ✅ Medium devices (tablets) */
-          @media (max-width: 1024px) {
-            nav {
-              padding: 14px 0;
-            }
-            nav div:first-child {
-              font-size: 3vw;
-              margin-left: 20px;
-            }
+          /* ✅ Desktop */
+          @media (min-width: 769px) {
             .nav-links {
-              gap: 3vw;
-              margin-right: 20px;
-            }
-            nav a {
-              font-size: 1.4vw !important;
+              display: flex !important;
             }
           }
 
-          /* ✅ Small tablets & large phones */
+          /* ✅ Tablets & Phones */
           @media (max-width: 768px) {
             nav {
+              flex-direction: row;
+              justify-content: space-between;
+              padding: 12px 20px;
+            }
+
+            .nav-links {
+              position: absolute;
+              top: 70px;
+              left: 0;
+              width: 100%;
+              background: rgba(0, 0, 0, 0.9);
               flex-direction: column;
               align-items: center;
-              padding: 12px 0;
+              gap: 15px;
+              padding: 20px 0;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+              border-top: 1px solid rgba(67, 233, 123, 0.2);
+              opacity: 0;
+              transform: translateY(-20px);
+              pointer-events: none;
+              transition: all 0.3s ease;
             }
-            nav div:first-child {
-              font-size: 5vw;
-              margin: 0 0 10px 0;
-              text-align: center;
-            }
-            .nav-links {
-              justify-content: center;
-              gap: 4vw;
-              margin: 0;
-              flex-wrap: wrap;
-            }
-            nav a {
-              font-size: 3.5vw !important;
-              padding: 1.5vw 3.5vw;
-            }
-          }
 
-          /* ✅ Android & small phones (up to 480px) */
-          @media (max-width: 480px) {
-            nav {
-              flex-direction: column;
-              justify-content: center;
-              padding: 10px 0;
+            .nav-links.open {
+              opacity: 1;
+              transform: translateY(0);
+              pointer-events: all;
             }
+
+            .hamburger {
+              display: flex !important;
+            }
+
             nav div:first-child {
               font-size: 6vw;
-              margin-bottom: 10px;
-              text-align: center;
+              text-shadow: 0 0 15px #43e97b, 0 0 35px #38f9d7;
+              color: #00ffae;
+              animation: glowPulse 2s infinite alternate;
+              margin-left: 10px;
             }
-            .nav-links {
-              flex-direction: column;
-              align-items: center;
-              gap: 10px;
-              margin: 0;
-              width: 100%;
-            }
+
             nav a {
               font-size: 4.2vw !important;
               padding: 2.5vw 6vw;
@@ -152,15 +169,10 @@ export default function Navbar() {
             }
           }
 
-          /* ✅ Ultra-small devices (320px–360px width) */
-          @media (max-width: 360px) {
-            nav div:first-child {
-              font-size: 6.5vw;
-            }
-            nav a {
-              font-size: 4.6vw !important;
-              padding: 3vw 5vw;
-            }
+          /* Glowing title effect */
+          @keyframes glowPulse {
+            0% { text-shadow: 0 0 8px #43e97b, 0 0 20px #38f9d7; }
+            100% { text-shadow: 0 0 20px #38f9d7, 0 0 40px #43e97b; }
           }
         `}
       </style>

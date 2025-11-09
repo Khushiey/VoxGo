@@ -105,7 +105,7 @@ export default function AIVoiceInput() {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 3rem;
+          padding: 2rem;
         }
 
         .qa-card {
@@ -114,16 +114,16 @@ export default function AIVoiceInput() {
           background: #0b192f;
           border-radius: 24px;
           box-shadow: 0 8px 50px rgba(0, 0, 0, 0.6);
-          padding: 4rem;
+          padding: 3rem 4rem;
           display: flex;
           flex-direction: column;
-          gap: 3rem;
+          gap: 2.5rem;
           color: #d1d5db;
         }
 
         .qa-title {
           text-align: center;
-          font-size: 4rem;
+          font-size: 3rem;
           font-weight: 800;
           color: #00ffae;
           text-shadow: 0 0 20px #00ffae, 0 0 40px #00ffae;
@@ -132,38 +132,38 @@ export default function AIVoiceInput() {
         .qa-subtitle {
           text-align: center;
           color: #a3a3a3;
-          font-size: 1.8rem;
+          font-size: 1.4rem;
         }
 
         .qa-controls {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 2rem;
+          gap: 1.5rem;
         }
 
         .qa-btn {
           background-color: #00ffae;
           color: #000;
           font-weight: 700;
-          padding: 1.5rem 3rem;
+          padding: 1.2rem 2.5rem;
           border-radius: 16px;
           border: none;
           cursor: pointer;
-          font-size: 2rem;
+          font-size: 1.5rem;
           transition: all 0.3s ease-in-out;
-          box-shadow: 0 0 30px rgba(0, 255, 174, 0.6);
+          box-shadow: 0 0 25px rgba(0, 255, 174, 0.6);
         }
 
         .qa-btn:hover {
           background-color: #00e69d;
-          box-shadow: 0 0 50px rgba(0, 255, 174, 0.8);
+          box-shadow: 0 0 40px rgba(0, 255, 174, 0.8);
         }
 
         .qa-btn.stop {
           background-color: #ef4444;
           color: white;
-          box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+          box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
         }
 
         .qa-btn.stop:hover {
@@ -174,13 +174,13 @@ export default function AIVoiceInput() {
           text-align: center;
           font-family: monospace;
           color: #9ca3af;
-          font-size: 2rem;
+          font-size: 1.4rem;
         }
 
         .qa-status {
           text-align: center;
           font-weight: 700;
-          font-size: 1.8rem;
+          font-size: 1.2rem;
           color: #00ffae;
         }
 
@@ -190,7 +190,7 @@ export default function AIVoiceInput() {
           padding: 1rem;
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 1rem;
           background-color: rgba(17, 24, 39, 0.6);
           border-radius: 16px;
         }
@@ -199,9 +199,9 @@ export default function AIVoiceInput() {
           background: #142437;
           border: 2px solid #1e3a8a;
           border-radius: 12px;
-          padding: 1.5rem;
+          padding: 1rem;
           color: #e5e7eb;
-          font-size: 1.6rem;
+          font-size: 1.2rem;
         }
 
         .qa-message.ai {
@@ -211,9 +211,9 @@ export default function AIVoiceInput() {
 
         .qa-message small {
           display: block;
-          font-size: 1.1rem;
+          font-size: 0.9rem;
           color: #6b7280;
-          margin-top: 8px;
+          margin-top: 5px;
           text-align: right;
         }
 
@@ -221,11 +221,11 @@ export default function AIVoiceInput() {
           align-self: center;
           background-color: #ef4444;
           color: #fff;
-          padding: 1.2rem 2.5rem;
+          padding: 1rem 2rem;
           border-radius: 16px;
           border: none;
           cursor: pointer;
-          font-size: 1.8rem;
+          font-size: 1.2rem;
           font-weight: 700;
           transition: all 0.3s ease;
           box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
@@ -237,12 +237,66 @@ export default function AIVoiceInput() {
         }
 
         .qa-history::-webkit-scrollbar {
-          width: 16px;
+          width: 12px;
         }
 
         .qa-history::-webkit-scrollbar-thumb {
           background-color: #374151;
           border-radius: 8px;
+        }
+
+        /* ✅ Responsive Design */
+        @media (max-width: 1024px) {
+          .qa-card {
+            padding: 2rem 3rem;
+          }
+          .qa-title {
+            font-size: 2.5rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .qa-card {
+            padding: 2rem;
+          }
+          .qa-title {
+            font-size: 2rem;
+          }
+          .qa-subtitle {
+            font-size: 1.2rem;
+          }
+          .qa-btn {
+            font-size: 1.3rem;
+            padding: 1rem 2rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .qa-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+          }
+          .qa-title {
+            font-size: 1.6rem;
+          }
+          .qa-subtitle {
+            font-size: 1rem;
+          }
+          .qa-btn {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 0.8rem 1rem;
+          }
+          .qa-reset-btn {
+            width: 100%;
+            font-size: 1.1rem;
+          }
+          .qa-history {
+            max-height: 25rem;
+          }
+          .qa-message {
+            font-size: 1rem;
+          }
         }
       `}</style>
 
@@ -253,7 +307,6 @@ export default function AIVoiceInput() {
             Speak your question to interact with the AI. Conversation history is below.
           </p>
 
-          {/* Controls */}
           <div className="qa-controls">
             <button
               onClick={isRecording ? handleStop : handleStart}
@@ -273,10 +326,9 @@ export default function AIVoiceInput() {
             </div>
           </div>
 
-          {/* History */}
           <div className="qa-history">
             {recordings.length === 0 ? (
-              <p style={{ textAlign: "center", color: "#9ca3af", fontSize: "1.6rem" }}>
+              <p style={{ textAlign: "center", color: "#9ca3af", fontSize: "1.2rem" }}>
                 No conversation yet.
               </p>
             ) : (
@@ -290,7 +342,6 @@ export default function AIVoiceInput() {
             )}
           </div>
 
-          {/* Reset */}
           <button onClick={handleReset} className="qa-reset-btn">
             🔄 Reset
           </button>
