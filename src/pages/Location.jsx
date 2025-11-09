@@ -15,6 +15,7 @@ const locationIcon = new L.Icon({
   popupAnchor: [0, -45],
 });
 
+// Routing component
 function Routing({ destination }) {
   const map = useMap();
 
@@ -25,7 +26,7 @@ function Routing({ destination }) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const origin = L.latLng(pos.coords.latitude, pos.coords.longitude);
 
-        // Remove old routing controls
+        // Remove old routes if any
         map.eachLayer((layer) => {
           if (
             layer._container &&
@@ -35,11 +36,31 @@ function Routing({ destination }) {
           }
         });
 
-        L.Routing.control({
+        const routingControl = L.Routing.control({
           waypoints: [origin, L.latLng(destination.lat, destination.lng)],
-          routeWhileDragging: true,
-          createMarker: () => null, // Prevent duplicate markers
-        }).addTo(map);
+          routeWhileDragging: false,
+          lineOptions: {
+            styles: [{ color: "#43e97b", weight: 5, opacity: 0.9 }],
+          },
+          showAlternatives: false,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          createMarker: () => null,
+        })
+          .on("routesfound", (e) => {
+            const route = e.routes[0];
+            if (route && route.summary) {
+              const distance = (route.summary.totalDistance / 1000).toFixed(2);
+              const duration = (route.summary.totalTime / 60).toFixed(0);
+              speak(
+                `Found route. Distance ${distance} kilometers, approximately ${duration} minutes.`
+              );
+            }
+          })
+          .addTo(map);
+
+        return () => map.removeControl(routingControl);
       });
     }
   }, [map, destination]);
@@ -47,14 +68,14 @@ function Routing({ destination }) {
   return null;
 }
 
-// Component to auto-zoom on destination
+// Auto zoom to destination
 function ZoomToDestination({ destination }) {
   const map = useMap();
 
   useEffect(() => {
     if (destination) {
       map.flyTo([destination.lat, destination.lng], 15, {
-        duration: 2, // smooth animation
+        duration: 2,
       });
     }
   }, [destination, map]);
@@ -66,29 +87,55 @@ export default function LocationMap() {
   const [query, setQuery] = useState("");
   const [directions, setDirections] = useState("");
   const [destination, setDestination] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // Handle location search
   const handleLocation = async (text) => {
+    if (!text.trim()) return;
     setQuery(text);
+    setLoading(true);
     speak(`Searching directions for ${text}...`);
 
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${text}`
-    );
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          text + ", India"
+        )}&limit=3&addressdetails=1`
+      );
+      const data = await res.json();
 
-    if (data[0]) {
-      const dest = {
-        lat: parseFloat(data[0].lat),
-        lng: parseFloat(data[0].lon),
-      };
-      setDestination(dest);
+      if (data.length > 0) {
+        const bestMatch =
+          data.find((d) =>
+            (d.display_name || "").toLowerCase().includes("college")
+          ) || data[0];
 
-      const response = `Here are the directions to ${text}.`;
-      setDirections(response);
-      speak(response);
-    } else {
-      setDirections("Location not found, please try again.");
-      speak("Location not found, please try again.");
+        const dest = {
+          lat: parseFloat(bestMatch.lat),
+          lng: parseFloat(bestMatch.lon),
+        };
+        setDestination(dest);
+
+        const response = `Here are the directions to ${bestMatch.display_name}.`;
+        setDirections(response);
+        speak(response);
+      } else {
+        setDirections("Location not found, please try again.");
+        speak("Location not found, please try again.");
+      }
+    } catch (err) {
+      console.error("❌ Geocoding error:", err);
+      setDirections("Network error. Please check your connection.");
+      speak("There was a network problem. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Enter key press
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleLocation(query);
     }
   };
 
@@ -99,12 +146,13 @@ export default function LocationMap() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: destination ? "flex-start" : "center",
         backgroundImage: "url('https://wallpapercave.com/wp/wp12782258.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         fontFamily: "'Montserrat', 'Segoe UI', Arial, sans-serif",
         padding: "20px",
+        transition: "all 0.5s ease",
       }}
     >
       {/* Card UI */}
@@ -116,7 +164,7 @@ export default function LocationMap() {
           boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
           padding: "20px",
           textAlign: "center",
-          marginBottom: "20px",
+          marginBottom: destination ? "20px" : "0",
         }}
       >
         <h2
@@ -136,6 +184,7 @@ export default function LocationMap() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyPress}
             placeholder="Enter location..."
             style={{
               fontSize: "1.2vw",
@@ -150,6 +199,7 @@ export default function LocationMap() {
           />
           <button
             onClick={() => handleLocation(query)}
+            disabled={loading}
             style={{
               padding: "0.8vw 1.2vw",
               background: "linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)",
@@ -158,9 +208,10 @@ export default function LocationMap() {
               color: "#222",
               fontWeight: "600",
               cursor: "pointer",
+              opacity: loading ? 0.7 : 1,
             }}
           >
-            Search
+            {loading ? "Searching..." : "Search"}
           </button>
           <VoiceButton
             onResult={handleLocation}
@@ -190,22 +241,32 @@ export default function LocationMap() {
         )}
       </div>
 
-      {/* Map */}
-      <div style={{ width: "80vw", height: "70vh", borderRadius: "20px", overflow: "hidden" }}>
-        <MapContainer center={[28.7041, 77.1025]} zoom={13} style={{ width: "100%", height: "100%" }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-          {destination && (
-            <>
-              <Routing destination={destination} />
-              <ZoomToDestination destination={destination} />
-              <Marker position={[destination.lat, destination.lng]} icon={locationIcon} />
-            </>
-          )}
-        </MapContainer>
-      </div>
+      {/* Map appears only after searching */}
+      {destination && (
+        <div
+          style={{
+            width: "80vw",
+            height: "70vh",
+            borderRadius: "20px",
+            overflow: "hidden",
+            marginTop: "20px",
+          }}
+        >
+          <MapContainer
+            center={[destination.lat, destination.lng]}
+            zoom={14}
+            style={{ width: "100%", height: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="&copy; OpenStreetMap contributors"
+            />
+            <Routing destination={destination} />
+            <ZoomToDestination destination={destination} />
+            <Marker position={[destination.lat, destination.lng]} icon={locationIcon} />
+          </MapContainer>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [listening, setListening] = useState(false);
 
   const handleVoiceCommand = () => {
     const SpeechRecognition =
@@ -20,9 +21,11 @@ export default function Landing() {
 
     try {
       recognition.start();
+      setListening(true);
       console.log("🎤 Voice recognition started...");
 
       recognition.onresult = (event) => {
+        setListening(false);
         const command = event.results[0][0].transcript.toLowerCase().trim();
         console.log("✅ Voice command received:", command);
 
@@ -37,12 +40,15 @@ export default function Landing() {
         ) {
           navigate("/qa");
         } else {
-          alert(`Unrecognized command: "${command}". Try saying "location", "translator", or "Q A".`);
+          alert(
+            `Unrecognized command: "${command}". Try saying "location", "translator", or "Q A".`
+          );
         }
       };
 
       recognition.onerror = (event) => {
         console.error("❌ Speech recognition error:", event.error);
+        setListening(false);
         if (event.error === "not-allowed") {
           alert("Microphone permission denied. Please allow mic access.");
         } else {
@@ -52,10 +58,12 @@ export default function Landing() {
 
       recognition.onend = () => {
         console.log("🔇 Voice recognition ended.");
+        setListening(false);
       };
     } catch (err) {
       console.error("🚫 Failed to start voice recognition:", err);
       alert("Voice recognition could not be started.");
+      setListening(false);
     }
   };
 
@@ -106,6 +114,7 @@ export default function Landing() {
         >
           🚀 VoxGo
         </h1>
+
         <p
           style={{
             fontSize: "1.7vw",
@@ -121,6 +130,7 @@ export default function Landing() {
         >
           Get answers, translate languages, and find locations — all by voice!
         </p>
+
         <div
           className="flex"
           style={{
@@ -141,29 +151,31 @@ export default function Landing() {
           </Link>
         </div>
 
-        {/* 🎤 Mic Button */}
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
+        {/* 🎙️ Speak Button */}
+        <div style={{ marginTop: "32px", textAlign: "center" }}>
           <button
             onClick={handleVoiceCommand}
+            disabled={listening}
             style={{
-              background: "rgba(255, 255, 255, 0.1)",
-              border: "2px solid #43e97b",
-              borderRadius: "50%",
-              padding: "14px",
-              fontSize: "1.5vw",
-              color: "#43e97b",
+              background: listening
+                ? "linear-gradient(90deg, #ff7eb3 0%, #ff758c 100%)"
+                : "linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)",
+              border: "none",
+              borderRadius: "50px",
+              padding: "12px 28px",
+              fontSize: "1.3vw",
+              color: "#fff",
+              fontWeight: "600",
               cursor: "pointer",
-              transition: "transform 0.2s",
+              transition: "all 0.3s ease",
+              boxShadow: listening
+                ? "0 0 30px rgba(255, 118, 136, 0.6)"
+                : "0 0 20px rgba(67, 233, 123, 0.4)",
+              transform: listening ? "scale(1.05)" : "scale(1)",
+              fontFamily: "'Montserrat', sans-serif",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform = "scale(1.1)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.transform = "scale(1.0)")
-            }
-            title="Speak to Navigate"
           >
-            🎤
+            {listening ? "🎧 Listening..." : "🎙️ Speak"}
           </button>
         </div>
       </div>

@@ -1,5 +1,7 @@
-export const speak = (text) => {
+export const speak = (text, lang = "en") => {
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  window.speechSynthesis.speak(utterance);
+  utterance.lang = lang;
+  utterance.rate = 1;
+  speechSynthesis.cancel(); // stop previous voice
+  speechSynthesis.speak(utterance);
 };

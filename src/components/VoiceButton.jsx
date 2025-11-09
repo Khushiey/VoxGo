@@ -1,32 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 
-export default function VoiceButton({ onResult }) {
-  const [listening, setListening] = useState(false);
+export default function VoiceButton({ onResult, style }) {
+  const handleVoice = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  const startListening = () => {
-    const recognition =
-      new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    if (!SpeechRecognition) {
+      alert("Speech Recognition is not supported in this browser.");
+      return;
+    }
 
-    recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
+    const recognition = new SpeechRecognition();
+    recognition.lang = "auto";
+    recognition.start();
 
     recognition.onresult = (event) => {
       const text = event.results[0][0].transcript;
       onResult(text);
     };
-
-    recognition.start();
   };
 
   return (
-    <button
-      className={`button ${listening ? "red listening-animation" : "green"}`}
-      onClick={startListening}
-    >
-      {listening ? "Listening..." : "🎤 Speak"}
+    <button onClick={handleVoice} style={style}>
+      🎙️
     </button>
   );
 }
