@@ -141,6 +141,7 @@ export default function LocationMap() {
 
   return (
     <div
+      className="location-page"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -157,6 +158,7 @@ export default function LocationMap() {
     >
       {/* Card UI */}
       <div
+        className="location-card"
         style={{
           background: "rgba(0,0,0,0.5)",
           width: "60vw",
@@ -168,6 +170,7 @@ export default function LocationMap() {
         }}
       >
         <h2
+          className="location-title"
           style={{
             fontSize: "2vw",
             color: "#fff",
@@ -180,7 +183,7 @@ export default function LocationMap() {
           Location Directions
         </h2>
 
-        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+        <div className="location-inputs" style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -195,6 +198,7 @@ export default function LocationMap() {
               background: "rgba(255,255,255,0.85)",
               color: "#222",
               width: "20vw",
+              minWidth: "180px",
             }}
           />
           <button
@@ -229,6 +233,7 @@ export default function LocationMap() {
 
         {directions && (
           <div
+            className="directions-text"
             style={{
               marginTop: "15px",
               color: "#fff",
@@ -244,6 +249,7 @@ export default function LocationMap() {
       {/* Map appears only after searching */}
       {destination && (
         <div
+          className="map-wrapper"
           style={{
             width: "80vw",
             height: "70vh",
@@ -267,6 +273,92 @@ export default function LocationMap() {
           </MapContainer>
         </div>
       )}
+
+      {/* ✅ Responsive styles */}
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&display=swap');
+
+          @media (max-width: 1024px) {
+            .location-card {
+              width: 80vw !important;
+              padding: 16px !important;
+            }
+            .location-title {
+              font-size: 2.6vw !important;
+            }
+            .directions-text {
+              font-size: 1.8vw !important;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .location-card {
+              width: 90vw !important;
+              border-radius: 20px !important;
+              padding: 14px !important;
+            }
+            .location-title {
+              font-size: 4vw !important;
+              margin-bottom: 12px !important;
+            }
+            .location-inputs {
+              flex-direction: column !important;
+              align-items: center !important;
+              gap: 12px !important;
+            }
+            .location-card input {
+              font-size: 3vw !important;
+              width: 70vw !important;
+              padding: 2vw !important;
+            }
+            .location-card button,
+            .location-card button[type="button"],
+            .location-card .voice-button {
+              font-size: 3vw !important;
+              padding: 2vw 4vw !important;
+            }
+            .directions-text {
+              font-size: 3vw !important;
+              margin-top: 10px !important;
+            }
+            .map-wrapper {
+              width: 95vw !important;
+              height: 60vh !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .location-card {
+              width: 95vw !important;
+              border-radius: 16px !important;
+              padding: 12px !important;
+            }
+            .location-title {
+              font-size: 6vw !important;
+              letter-spacing: 1px !important;
+            }
+            .location-card input {
+              font-size: 4vw !important;
+              width: 80vw !important;
+              padding: 3vw 4vw !important;
+            }
+            .location-card button {
+              font-size: 4vw !important;
+              padding: 3vw 5vw !important;
+              width: 60%;
+            }
+            .directions-text {
+              font-size: 4vw !important;
+            }
+            .map-wrapper {
+              width: 95vw !important;
+              height: 50vh !important;
+              margin-top: 16px !important;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }

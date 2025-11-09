@@ -83,6 +83,7 @@ export default function Landing() {
       }}
     >
       <div
+        className="landing-box"
         style={{
           background: "rgba(0,0,0,0.5)",
           width: "40vw",
@@ -99,6 +100,7 @@ export default function Landing() {
         }}
       >
         <h1
+          className="landing-title"
           style={{
             fontSize: "5vw",
             color: "#fff",
@@ -116,6 +118,7 @@ export default function Landing() {
         </h1>
 
         <p
+          className="landing-subtitle"
           style={{
             fontSize: "1.7vw",
             color: "#e0e0e0",
@@ -132,7 +135,7 @@ export default function Landing() {
         </p>
 
         <div
-          className="flex"
+          className="flex landing-btns"
           style={{
             gap: "28px",
             marginTop: "18px",
@@ -156,6 +159,7 @@ export default function Landing() {
           <button
             onClick={handleVoiceCommand}
             disabled={listening}
+            className="speak-btn"
             style={{
               background: listening
                 ? "linear-gradient(90deg, #ff7eb3 0%, #ff758c 100%)"
@@ -180,7 +184,7 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Animations & Font Import */}
+      {/* Animations & Responsive Styles */}
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&display=swap');
@@ -221,6 +225,89 @@ export default function Landing() {
             box-shadow: 0 8px 32px rgba(67,233,123,0.25);
             background: linear-gradient(90deg, #38f9d7 0%, #43e97b 100%);
             color: #fff;
+          }
+
+          /* ✅ Responsive Design */
+          @media (max-width: 1024px) {
+            .landing-box {
+              width: 60vw !important;
+              padding: 24px 10px !important;
+            }
+            .landing-title {
+              font-size: 6vw !important;
+            }
+            .landing-subtitle {
+              font-size: 2.2vw !important;
+              margin-bottom: 28px !important;
+            }
+            .landing-btn {
+              font-size: 1.6vw !important;
+              padding: 1vw 2vw !important;
+            }
+            .speak-btn {
+              font-size: 1.8vw !important;
+              padding: 14px 28px !important;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .landing-box {
+              width: 80vw !important;
+              min-height: 45vh !important;
+              border-radius: 24px !important;
+              padding: 20px 10px !important;
+            }
+            .landing-title {
+              font-size: 8vw !important;
+              margin-bottom: 18px !important;
+            }
+            .landing-subtitle {
+              font-size: 3vw !important;
+            }
+            .landing-btns {
+              flex-wrap: wrap !important;
+              gap: 16px !important;
+            }
+            .landing-btn {
+              font-size: 3vw !important;
+              padding: 2vw 5vw !important;
+            }
+            .speak-btn {
+              font-size: 3vw !important;
+              padding: 2vw 5vw !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .landing-box {
+              width: 90vw !important;
+              min-height: 50vh !important;
+              border-radius: 20px !important;
+              padding: 16px 8px !important;
+            }
+            .landing-title {
+              font-size: 10vw !important;
+              letter-spacing: 3px !important;
+            }
+            .landing-subtitle {
+              font-size: 4vw !important;
+              margin-bottom: 24px !important;
+              letter-spacing: 1px !important;
+            }
+            .landing-btns {
+              flex-direction: column !important;
+              align-items: center !important;
+              gap: 12px !important;
+            }
+            .landing-btn {
+              width: 70%;
+              font-size: 4vw !important;
+              padding: 3vw 5vw !important;
+            }
+            .speak-btn {
+              font-size: 4vw !important;
+              padding: 3vw 6vw !important;
+            }
           }
         `}
       </style>

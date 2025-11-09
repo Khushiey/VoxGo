@@ -32,6 +32,7 @@ export default function Navbar() {
         🚀 VoxGo
       </div>
       <div
+        className="nav-links"
         style={{
           display: "flex",
           gap: "2vw",
@@ -99,12 +100,73 @@ export default function Navbar() {
           Q/A
         </Link>
       </div>
+
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&display=swap');
+          
           nav a:hover {
             background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
             color: #222 !important;
+          }
+
+          /* ✅ Responsive Styles */
+          @media (max-width: 1024px) {
+            nav {
+              padding: 14px 0;
+            }
+            nav div:first-child {
+              font-size: 3vw;
+              margin-left: 20px;
+            }
+            .nav-links {
+              gap: 3vw;
+              margin-right: 20px;
+            }
+            nav a {
+              font-size: 1.4vw !important;
+            }
+          }
+
+          @media (max-width: 768px) {
+            nav {
+              flex-direction: column;
+              padding: 12px 0;
+            }
+            nav div:first-child {
+              font-size: 5vw;
+              margin-left: 0;
+              margin-bottom: 10px;
+            }
+            .nav-links {
+              flex-wrap: wrap;
+              justify-content: center;
+              gap: 4vw;
+              margin: 0;
+            }
+            nav a {
+              font-size: 3.5vw !important;
+              padding: 1vw 3vw;
+            }
+          }
+
+          @media (max-width: 480px) {
+            nav {
+              padding: 10px 0;
+            }
+            nav div:first-child {
+              font-size: 6vw;
+              margin-bottom: 8px;
+            }
+            .nav-links {
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+            }
+            nav a {
+              font-size: 4vw !important;
+              padding: 2vw 4vw;
+            }
           }
         `}
       </style>

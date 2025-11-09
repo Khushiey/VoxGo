@@ -1,165 +1,301 @@
-"use client";
+import React, { useState, useEffect, useRef } from "react";
 
-import { useState, useEffect, useRef } from "react";
-import AIVoiceInput from "../components/ui/ai-voice-input";
-
-const QAPage = () => {
+export default function AIVoiceInput() {
   const [recordings, setRecordings] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [textInput, setTextInput] = useState("");
+  const [timer, setTimer] = useState(0);
   const recognitionRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const rec = new SpeechRecognition();
-        rec.lang = "en-US";
-        rec.continuous = true;
-        rec.interimResults = false;
-
-        rec.onresult = (event) => {
-          const lastResultIndex = event.results.length - 1;
-          const transcript =
-            event.results[lastResultIndex][0].transcript.trim().toLowerCase();
-
-          if (!transcript) return;
-          handleCommand(transcript);
-        };
-
-        rec.onend = () => {
-          if (isRecording) rec.start(); // auto-restart for continuous listening
-        };
-
-        recognitionRef.current = rec;
-      }
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser doesn’t support Speech Recognition. Try using Google Chrome.");
+      return;
     }
-  }, [isRecording]);
 
-  const handleCommand = (command) => {
-    setRecordings((prev) => [
-      ...prev.slice(-4),
-      { timestamp: new Date(), transcript: `🗣️ ${command}` },
-    ]);
+    const rec = new SpeechRecognition();
+    rec.lang = "en-US";
+    rec.continuous = true;
+    rec.interimResults = false;
 
-    const response = getQuickResponse(command);
-    setRecordings((prev) => [
-      ...prev,
-      { timestamp: new Date(), transcript: `🤖 ${response}` },
-    ]);
+    rec.onresult = async (event) => {
+      const transcript = event.results[0][0].transcript.trim();
+      if (!transcript) return;
 
-    speakText(response);
+      setRecordings((prev) => [
+        ...prev,
+        { role: "user", text: transcript, timestamp: new Date() },
+      ]);
+
+      try {
+        const res = await fetch("https://aiaudiochatbot-backend.vercel.app/api/ask-groq", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: transcript }),
+        });
+
+        const data = await res.json();
+        const answer = data.answer || "Sorry, I couldn’t process that.";
+
+        setRecordings((prev) => [
+          ...prev,
+          { role: "ai", text: answer, timestamp: new Date() },
+        ]);
+
+        speakText(answer);
+      } catch (err) {
+        console.error("Error fetching AI response:", err);
+      }
+    };
+
+    rec.onend = () => {
+      setIsRecording(false);
+      stopTimer();
+    };
+
+    recognitionRef.current = rec;
+  }, []);
+
+  const startTimer = () => {
+    setTimer(0);
+    timerRef.current = setInterval(() => setTimer((t) => t + 1), 1000);
   };
+
+  const stopTimer = () => clearInterval(timerRef.current);
+
+  const formatTime = (seconds) =>
+    `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
   const handleStart = () => {
     if (isRecording) return;
     setIsRecording(true);
     recognitionRef.current?.start();
+    startTimer();
   };
 
   const handleStop = () => {
     recognitionRef.current?.stop();
     setIsRecording(false);
+    stopTimer();
   };
 
   const handleReset = () => {
     setRecordings([]);
-    setTextInput("");
+    setTimer(0);
+    stopTimer();
     speechSynthesis.cancel();
   };
 
-  const handleTextSubmit = (e) => {
-    e.preventDefault();
-    if (!textInput.trim()) return;
-    handleCommand(textInput.trim().toLowerCase());
-    setTextInput("");
+  const speakText = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.pitch = 1.1;
+    utterance.rate = 1;
+    speechSynthesis.speak(utterance);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 space-y-6">
-        {/* Voice Input & Controls */}
-        <div className="flex flex-col items-center justify-center gap-4">
-          <AIVoiceInput onStart={handleStart} onStop={handleStop} />
-          <button
-            onClick={handleReset}
-            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors"
-          >
-            Reset
-          </button>
+    <>
+      <style>{`
+        .qa-container {
+          min-height: 100vh;
+          background: linear-gradient(145deg, #0f172a, #0b2538);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem;
+        }
 
-          {/* Text Area for Written Commands */}
-          <form
-            onSubmit={handleTextSubmit}
-            className="w-full flex flex-col items-center gap-3 mt-4"
-          >
-            <textarea
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Type your command here..."
-              rows={3}
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-            />
+        .qa-card {
+          width: 100%;
+          max-width: 1200px;
+          background: #0b192f;
+          border-radius: 24px;
+          box-shadow: 0 8px 50px rgba(0, 0, 0, 0.6);
+          padding: 4rem;
+          display: flex;
+          flex-direction: column;
+          gap: 3rem;
+          color: #d1d5db;
+        }
+
+        .qa-title {
+          text-align: center;
+          font-size: 4rem;
+          font-weight: 800;
+          color: #00ffae;
+          text-shadow: 0 0 20px #00ffae, 0 0 40px #00ffae;
+        }
+
+        .qa-subtitle {
+          text-align: center;
+          color: #a3a3a3;
+          font-size: 1.8rem;
+        }
+
+        .qa-controls {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2rem;
+        }
+
+        .qa-btn {
+          background-color: #00ffae;
+          color: #000;
+          font-weight: 700;
+          padding: 1.5rem 3rem;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          font-size: 2rem;
+          transition: all 0.3s ease-in-out;
+          box-shadow: 0 0 30px rgba(0, 255, 174, 0.6);
+        }
+
+        .qa-btn:hover {
+          background-color: #00e69d;
+          box-shadow: 0 0 50px rgba(0, 255, 174, 0.8);
+        }
+
+        .qa-btn.stop {
+          background-color: #ef4444;
+          color: white;
+          box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+        }
+
+        .qa-btn.stop:hover {
+          background-color: #dc2626;
+        }
+
+        .qa-timer {
+          text-align: center;
+          font-family: monospace;
+          color: #9ca3af;
+          font-size: 2rem;
+        }
+
+        .qa-status {
+          text-align: center;
+          font-weight: 700;
+          font-size: 1.8rem;
+          color: #00ffae;
+        }
+
+        .qa-history {
+          max-height: 40rem;
+          overflow-y: auto;
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          background-color: rgba(17, 24, 39, 0.6);
+          border-radius: 16px;
+        }
+
+        .qa-message {
+          background: #142437;
+          border: 2px solid #1e3a8a;
+          border-radius: 12px;
+          padding: 1.5rem;
+          color: #e5e7eb;
+          font-size: 1.6rem;
+        }
+
+        .qa-message.ai {
+          background: #12283a;
+          border-color: #00ffae;
+        }
+
+        .qa-message small {
+          display: block;
+          font-size: 1.1rem;
+          color: #6b7280;
+          margin-top: 8px;
+          text-align: right;
+        }
+
+        .qa-reset-btn {
+          align-self: center;
+          background-color: #ef4444;
+          color: #fff;
+          padding: 1.2rem 2.5rem;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          font-size: 1.8rem;
+          font-weight: 700;
+          transition: all 0.3s ease;
+          box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+        }
+
+        .qa-reset-btn:hover {
+          background-color: #dc2626;
+          box-shadow: 0 0 40px rgba(239, 68, 68, 0.7);
+        }
+
+        .qa-history::-webkit-scrollbar {
+          width: 16px;
+        }
+
+        .qa-history::-webkit-scrollbar-thumb {
+          background-color: #374151;
+          border-radius: 8px;
+        }
+      `}</style>
+
+      <div className="qa-container">
+        <div className="qa-card">
+          <h1 className="qa-title">Q/A Voice Assistant</h1>
+          <p className="qa-subtitle">
+            Speak your question to interact with the AI. Conversation history is below.
+          </p>
+
+          {/* Controls */}
+          <div className="qa-controls">
             <button
-              type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              onClick={isRecording ? handleStop : handleStart}
+              className={`qa-btn ${isRecording ? "stop" : ""}`}
             >
-              Send
+              {isRecording ? "🛑 Stop" : "🎤 Speak"}
             </button>
-          </form>
-        </div>
 
-        {/* Conversation History */}
-        <div>
-          <ul className="space-y-2 max-h-96 overflow-y-auto">
-            {recordings.map((rec, i) => (
-              <li
-                key={i}
-                className={`p-3 border rounded-md ${
-                  i % 2 === 0 ? "bg-gray-50" : "bg-white"
-                } flex items-start gap-2 text-sm text-gray-700`}
+            <div>
+              <p className="qa-timer">{formatTime(timer)}</p>
+              <p
+                className="qa-status"
+                style={{ color: isRecording ? "#00ffae" : "#9ca3af" }}
               >
-                <span className="font-mono text-gray-500 flex-shrink-0">
-                  {rec.timestamp.toLocaleTimeString()}:
-                </span>
-                <span>{rec.transcript || "No transcript"}</span>
-              </li>
-            ))}
-          </ul>
+                {isRecording ? "Recording..." : "Not Recording"}
+              </p>
+            </div>
+          </div>
+
+          {/* History */}
+          <div className="qa-history">
+            {recordings.length === 0 ? (
+              <p style={{ textAlign: "center", color: "#9ca3af", fontSize: "1.6rem" }}>
+                No conversation yet.
+              </p>
+            ) : (
+              recordings.map((rec, i) => (
+                <div key={i} className={`qa-message ${rec.role === "ai" ? "ai" : ""}`}>
+                  <strong>{rec.role === "ai" ? "🤖 AI:" : "🧠 You:"}</strong>{" "}
+                  {rec.text}
+                  <small>{rec.timestamp.toLocaleTimeString()}</small>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Reset */}
+          <button onClick={handleReset} className="qa-reset-btn">
+            🔄 Reset
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
-};
-
-// Quick Personal Assistant Logic
-const getQuickResponse = (text) => {
-  const now = new Date();
-  if (text.includes("time")) return `Current time is ${now.toLocaleTimeString()}`;
-  if (text.includes("date")) return `Today is ${now.toLocaleDateString()}`;
-  if (text.includes("hello") || text.includes("hi")) return "Hello! How can I help you?";
-  if (text.includes("your name")) return "I am your personal AI assistant.";
-  if (text.includes("weather")) return "I can’t fetch live weather right now.";
-  if (text.includes("joke")) return "Why did the developer go broke? Because he used up all his cache!";
-  if (text.includes("who is")) return "Sorry, I can’t search that right now.";
-  if (text.includes("reminder") || text.includes("remember"))
-    return "I can’t store reminders yet, but I’ll be able to soon!";
-  return "Sorry, I don’t know the answer. Try something else.";
-};
-
-// Speech synthesis
-const speakText = (text) => {
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  const voices = speechSynthesis.getVoices();
-  const femaleVoice =
-    voices.find((v) => v.name.includes("Google US English")) ||
-    voices.find((v) => v.gender === "female") ||
-    voices.find((v) => v.name.toLowerCase().includes("female"));
-  if (femaleVoice) utterance.voice = femaleVoice;
-  utterance.pitch = 1.2;
-  speechSynthesis.speak(utterance);
-};
-
-export default QAPage;
+}

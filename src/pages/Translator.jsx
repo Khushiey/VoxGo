@@ -8,7 +8,6 @@ export default function Translator() {
   const [sourceLang, setSourceLang] = useState("auto");
   const [targetLang, setTargetLang] = useState("hi");
 
-  // Function to speak translated text
   const speakText = (text, langCode) => {
     if (!window.speechSynthesis) return;
     const utterance = new SpeechSynthesisUtterance(text);
@@ -37,9 +36,7 @@ export default function Translator() {
 
   const handleTranslate = async (input) => {
     setText(input);
-
     try {
-      // Google Translate API
       const res = await fetch(
         `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(
           input
@@ -49,7 +46,6 @@ export default function Translator() {
       const translation = data[0][0][0];
       setTranslated(translation);
 
-      // Romanized version using Google Input Tools for Indian languages
       const indianLanguages = ["hi", "gu", "bn", "ta", "te", "mr", "ml", "kn", "pa", "or"];
       if (indianLanguages.includes(targetLang)) {
         const translitRes = await fetch(
@@ -64,11 +60,9 @@ export default function Translator() {
           setRomanized(translation);
         }
       } else {
-        // For other languages, fallback to the translated text itself
         setRomanized(translation);
       }
 
-      // Speak translated text
       speakText(translation, targetLang);
     } catch (error) {
       console.error(error);
@@ -88,8 +82,7 @@ export default function Translator() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage:
-          "url('https://wallpapercave.com/wp/wp12782258.jpg')",
+        backgroundImage: "url('https://wallpapercave.com/wp/wp12782258.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         fontFamily: "'Montserrat', 'Segoe UI', Arial, sans-serif",
@@ -185,20 +178,93 @@ export default function Translator() {
           />
         </div>
 
-       {translated && (
-  <div style={outputBox}>
-    <p style={{ fontSize: "1.6vw", color: "#fff", marginBottom: "6px" }}>
-      <strong>🌐 Translation:</strong> {translated}
-    </p>
-    {romanized && (
-      <p style={{ fontSize: "1.4vw", color: "#b2f2bb" }}>
-        <strong>🔡 Romanized:</strong> {romanized}
-      </p>
-    )}
-  </div>
-)}
-
+        {translated && (
+          <div style={outputBox}>
+            <p style={{ fontSize: "1.6vw", color: "#fff", marginBottom: "6px" }}>
+              <strong>🌐 Translation:</strong> {translated}
+            </p>
+            {romanized && (
+              <p style={{ fontSize: "1.4vw", color: "#b2f2bb" }}>
+                <strong>🔡 Romanized:</strong> {romanized}
+              </p>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* ✅ RESPONSIVE MEDIA QUERIES */}
+      <style>
+        {`
+          @media (max-width: 1024px) {
+            h2 {
+              font-size: 4vw !important;
+            }
+            span {
+              font-size: 2vw !important;
+            }
+            select {
+              font-size: 1.8vw !important;
+            }
+            input {
+              width: 40vw !important;
+              font-size: 2vw !important;
+            }
+          }
+
+          @media (max-width: 768px) {
+            div[style*="width: 50vw"] {
+              width: 80vw !important;
+              padding: 30px 20px !important;
+            }
+            input {
+              width: 55vw !important;
+              font-size: 3vw !important;
+            }
+            select {
+              font-size: 2.5vw !important;
+            }
+            h2 {
+              font-size: 5vw !important;
+            }
+            span {
+              font-size: 2.6vw !important;
+            }
+            p {
+              font-size: 2.8vw !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            div[style*="width: 50vw"] {
+              width: 90vw !important;
+              padding: 20px 15px !important;
+              border-radius: 18px !important;
+            }
+            input {
+              width: 70vw !important;
+              font-size: 4vw !important;
+              padding: 2vw 3vw !important;
+            }
+            select {
+              font-size: 3.5vw !important;
+              padding: 2vw !important;
+            }
+            h2 {
+              font-size: 6vw !important;
+            }
+            span {
+              font-size: 3.5vw !important;
+            }
+            p {
+              font-size: 3.5vw !important;
+            }
+            button, .VoiceButton {
+              font-size: 6vw !important;
+              padding: 2vw 4vw !important;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
