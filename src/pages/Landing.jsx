@@ -183,7 +183,9 @@ export default function Landing() {
             {listening ? "🎧 Listening..." : "🎙️ Speak"}
           </button>
         </div>
+        
       </div>
+      <TurnBackButton />
 
       {/* Animations & Responsive Styles */}
       <style>
@@ -312,7 +314,6 @@ export default function Landing() {
           }
         `}
       </style>
-      <TurnBackButton />
     </div>
   );
 }

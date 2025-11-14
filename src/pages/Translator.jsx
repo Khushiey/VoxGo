@@ -197,12 +197,14 @@ const handleTranslate = async (input) => {
             )}
           </div>
         )}
+         <TurnBackButton />
       </div>
 
       {/* MEDIA QUERIES (unchanged) */}
       <style>{` /* same media queries */ `}</style>
-      <TurnBackButton />
+     
     </div>
+    
   );
 }
 
