@@ -26,7 +26,7 @@ export default function Navbar() {
       <div
         style={{
           fontWeight: "bold",
-          fontSize: "2vw",
+          fontSize: "3.5vw",
           color: "#fff",
           letterSpacing: "4px",
           textShadow: "0 2px 12px #43e97b",
