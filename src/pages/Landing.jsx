@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import TurnBackButton from "../components/ui/backbutton";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -311,6 +312,7 @@ export default function Landing() {
           }
         `}
       </style>
+      <TurnBackButton />
     </div>
   );
 }

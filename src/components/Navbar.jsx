@@ -36,7 +36,7 @@ export default function Navbar() {
         🚀 VoxGo
       </div>
 
-      {/* Hamburger Button (mobile only) */}
+      {/* Hamburger Button */}
       <div
         className="hamburger"
         onClick={() => setMenuOpen(!menuOpen)}
@@ -48,30 +48,9 @@ export default function Navbar() {
           gap: "6px",
         }}
       >
-        <div
-          style={{
-            width: "28px",
-            height: "3px",
-            background: "#43e97b",
-            borderRadius: "2px",
-          }}
-        ></div>
-        <div
-          style={{
-            width: "28px",
-            height: "3px",
-            background: "#43e97b",
-            borderRadius: "2px",
-          }}
-        ></div>
-        <div
-          style={{
-            width: "28px",
-            height: "3px",
-            background: "#43e97b",
-            borderRadius: "2px",
-          }}
-        ></div>
+        <div style={{ width: "28px", height: "3px", background: "#43e97b", borderRadius: "2px" }}></div>
+        <div style={{ width: "28px", height: "3px", background: "#43e97b", borderRadius: "2px" }}></div>
+        <div style={{ width: "28px", height: "3px", background: "#43e97b", borderRadius: "2px" }}></div>
       </div>
 
       {/* Navigation Links */}
@@ -85,16 +64,19 @@ export default function Navbar() {
           transition: "all 0.3s ease-in-out",
         }}
       >
-        <Link to="/" style={linkStyle}>
+        <Link to="/" style={linkStyle} onClick={() => setMenuOpen(false)}>
           Home
         </Link>
-        <Link to="/location" style={linkStyle}>
+
+        <Link to="/location" style={linkStyle} onClick={() => setMenuOpen(false)}>
           Location
         </Link>
-        <Link to="/translator" style={linkStyle}>
+
+        <Link to="/translator" style={linkStyle} onClick={() => setMenuOpen(false)}>
           Translator
         </Link>
-        <Link to="/qa" style={linkStyle}>
+
+        <Link to="/qa" style={linkStyle} onClick={() => setMenuOpen(false)}>
           Q/A
         </Link>
       </div>
@@ -108,14 +90,12 @@ export default function Navbar() {
             color: #222 !important;
           }
 
-          /* ✅ Desktop */
           @media (min-width: 769px) {
             .nav-links {
               display: flex !important;
             }
           }
 
-          /* ✅ Tablets & Phones */
           @media (max-width: 768px) {
             nav {
               flex-direction: row;
@@ -169,7 +149,6 @@ export default function Navbar() {
             }
           }
 
-          /* Glowing title effect */
           @keyframes glowPulse {
             0% { text-shadow: 0 0 8px #43e97b, 0 0 20px #38f9d7; }
             100% { text-shadow: 0 0 20px #38f9d7, 0 0 40px #43e97b; }

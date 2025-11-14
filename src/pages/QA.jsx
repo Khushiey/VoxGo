@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import TurnBackButton from "../components/ui/backbutton";
 
 export default function AIVoiceInput() {
   const [recordings, setRecordings] = useState([]);
@@ -346,6 +347,7 @@ export default function AIVoiceInput() {
             🔄 Reset
           </button>
         </div>
+        <TurnBackButton />
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import L from "leaflet";
 import "leaflet-routing-machine";
+import TurnBackButton from "../components/ui/backbutton";
 
 // Custom red pin icon
 const locationIcon = new L.Icon({
@@ -26,7 +27,7 @@ function Routing({ destination }) {
       navigator.geolocation.getCurrentPosition((pos) => {
         const origin = L.latLng(pos.coords.latitude, pos.coords.longitude);
 
-        // Remove old routes if any
+        // Remove existing routing control
         map.eachLayer((layer) => {
           if (
             layer._container &&
@@ -53,6 +54,21 @@ function Routing({ destination }) {
             if (route && route.summary) {
               const distance = (route.summary.totalDistance / 1000).toFixed(2);
               const duration = (route.summary.totalTime / 60).toFixed(0);
+
+              // ✔ Google Maps style route objects
+              const routeInfo = {
+                distance: `${distance} km`,
+                duration: `${duration} minutes`,
+                completeRoadMap: route.instructions.map((step, i) => ({
+                  step: i + 1,
+                  text: step.text,
+                  type: step.type,
+                  distance: `${(step.distance / 1000).toFixed(2)} km`,
+                })),
+              };
+
+              console.log("📌 Google-Map-Like Route Info", routeInfo);
+
               speak(
                 `Found route. Distance ${distance} kilometers, approximately ${duration} minutes.`
               );
@@ -74,9 +90,7 @@ function ZoomToDestination({ destination }) {
 
   useEffect(() => {
     if (destination) {
-      map.flyTo([destination.lat, destination.lng], 15, {
-        duration: 2,
-      });
+      map.flyTo([destination.lat, destination.lng], 15, { duration: 2 });
     }
   }, [destination, map]);
 
@@ -114,6 +128,7 @@ export default function LocationMap() {
           lat: parseFloat(bestMatch.lat),
           lng: parseFloat(bestMatch.lon),
         };
+
         setDestination(dest);
 
         const response = `Here are the directions to ${bestMatch.display_name}.`;
@@ -132,11 +147,8 @@ export default function LocationMap() {
     }
   };
 
-  // Handle Enter key press
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleLocation(query);
-    }
+    if (e.key === "Enter") handleLocation(query);
   };
 
   return (
@@ -156,7 +168,6 @@ export default function LocationMap() {
         transition: "all 0.5s ease",
       }}
     >
-      {/* Card UI */}
       <div
         className="location-card"
         style={{
@@ -183,7 +194,15 @@ export default function LocationMap() {
           Location Directions
         </h2>
 
-        <div className="location-inputs" style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap" }}>
+        <div
+          className="location-inputs"
+          style={{
+            display: "flex",
+            gap: "10px",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -217,8 +236,12 @@ export default function LocationMap() {
           >
             {loading ? "Searching..." : "Search"}
           </button>
+
+          {/* Updated Voice Button */}
           <VoiceButton
             onResult={handleLocation}
+            onStartListening={() => setDirections("Listening…")}
+            onStopListening={() => setDirections("")}
             style={{
               fontSize: "2vw",
               padding: "0.6vw 1vw",
@@ -246,7 +269,6 @@ export default function LocationMap() {
         )}
       </div>
 
-      {/* Map appears only after searching */}
       {destination && (
         <div
           className="map-wrapper"
@@ -274,7 +296,7 @@ export default function LocationMap() {
         </div>
       )}
 
-      {/* ✅ Responsive styles */}
+      {/* Styles unchanged */}
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;500&display=swap');
@@ -359,6 +381,7 @@ export default function LocationMap() {
           }
         `}
       </style>
+      <TurnBackButton />
     </div>
   );
 }
