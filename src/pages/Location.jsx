@@ -405,18 +405,18 @@ export default function LocationMap() {
     }
   };
 
-  const handleRouteFound = (routeData) => {
+  const handleRouteFound = useCallback((routeData) => {
     setRouteInfo(routeData);
     setRouteLoading(false);
-  };
+  }, []);
 
-  const handleRouteError = (error) => {
+  const handleRouteError = useCallback((error) => {
     console.warn("Route error:", error);
     setRouteLoading(false);
     setRouteInfo(null);
 
     let errorMessage = "Unable to calculate route.";
-    if (error.message) {
+    if (error?.message) {
       if (error.message.includes("timeout")) {
         errorMessage = "Route calculation timed out. The routing service might be busy.";
       } else if (error.message.includes("network")) {
@@ -428,7 +428,7 @@ export default function LocationMap() {
 
     setDirections(errorMessage);
     speak(errorMessage + " Please try again or use a different destination.");
-  };
+  }, []);
 
   const scrollToRouteInfo = () => {
     if (routeInfoRef.current) {
@@ -630,58 +630,6 @@ export default function LocationMap() {
         transition: "all 0.5s ease",
       }}
     >
-      {/* Interactive Help Panel */}
-      {showHelp && (
-        <div
-          style={{
-            width: "70vw",
-            background: "linear-gradient(135deg, rgba(67, 233, 123, 0.15) 0%, rgba(56, 249, 215, 0.15) 100%)",
-            border: "2px solid #43e97b",
-            borderRadius: "20px",
-            padding: "20px",
-            marginBottom: "20px",
-            color: "#fff",
-            animation: "slideDown 0.5s ease-out",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-            <h3 style={{ margin: 0, fontSize: "1.3vw", color: "#43e97b" }}>
-              🎯 How to Use Location Navigator
-            </h3>
-            <button
-              onClick={() => setShowHelp(false)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#fff",
-                fontSize: "1.3vw",
-                cursor: "pointer",
-              }}
-            >
-              ×
-            </button>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", fontSize: "0.95vw" }}>
-            <div style={{ padding: "10px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
-              <strong>🔍 Search Location</strong>
-              <p style={{ margin: "8px 0 0 0" }}>Type a place name and click Search or use voice input 🎤 to find directions</p>
-            </div>
-            <div style={{ padding: "10px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
-              <strong>📍 Find My Location</strong>
-              <p style={{ margin: "8px 0 0 0" }}>Click "My Location" to see your current position and nearby places</p>
-            </div>
-            <div style={{ padding: "10px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
-              <strong>📡 Track Movement</strong>
-              <p style={{ margin: "8px 0 0 0" }}>Enable GPS Tracking to monitor your real-time location and speed</p>
-            </div>
-            <div style={{ padding: "10px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
-              <strong>🗺️ Map Views</strong>
-              <p style={{ margin: "8px 0 0 0" }}>Switch between Street, Satellite, and Terrain views for different perspectives</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div
         className="location-card"
         style={{

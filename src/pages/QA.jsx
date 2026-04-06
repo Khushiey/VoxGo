@@ -7,6 +7,9 @@ export default function AIVoiceInput() {
   const [timer, setTimer] = useState(0);
   const [textInput, setTextInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [weather, setWeather] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
   const recognitionRef = useRef(null);
   const timerRef = useRef(null);
 
@@ -61,12 +64,93 @@ export default function AIVoiceInput() {
     recognitionRef.current = rec;
   }, []);
 
+  // Update current time every second
+  useEffect(() => {
+    const timeInterval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timeInterval);
+  }, []);
+
   const startTimer = () => {
     setTimer(0);
     timerRef.current = setInterval(() => setTimer((t) => t + 1), 1000);
   };
 
   const stopTimer = () => clearInterval(timerRef.current);
+
+  const getRealTimeContext = () => {
+    const now = new Date();
+    return {
+      now: now.toISOString(),
+      localTime: now.toLocaleString(),
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      locale: navigator.language || "en-US",
+      userAgent: navigator.userAgent,
+    };
+  };
+
+  // Fetch weather data
+  const fetchWeather = async () => {
+    setWeatherLoading(true);
+    try {
+      // Get user's location
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+
+      // Fetch weather data (using OpenWeatherMap API)
+      // Note: You'll need to get a free API key from https://openweathermap.org/api
+      const apiKey = process.env.REACT_APP_OPENWEATHER_API_KEY || 'demo_key';
+
+      if (apiKey === 'demo_key') {
+        // Demo mode - simulate weather data
+        setWeather({
+          temperature: Math.round(20 + Math.random() * 15),
+          description: ['sunny', 'cloudy', 'partly cloudy', 'rainy'][Math.floor(Math.random() * 4)],
+          city: 'Your Location',
+          icon: '01d',
+          humidity: Math.round(40 + Math.random() * 40),
+          windSpeed: Math.round(5 + Math.random() * 15),
+        });
+        speakText(`Demo weather: ${Math.round(20 + Math.random() * 15)} degrees Celsius, ${['sunny', 'cloudy', 'partly cloudy', 'rainy'][Math.floor(Math.random() * 4)]}`);
+        setWeatherLoading(false);
+        return;
+      }
+
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}`
+      );
+
+      if (!res.ok) {
+        throw new Error('Weather API request failed');
+      }
+
+      const data = await res.json();
+      setWeather({
+        temperature: Math.round(data.main.temp),
+        description: data.weather[0].description,
+        city: data.name,
+        icon: data.weather[0].icon,
+        humidity: data.main.humidity,
+        windSpeed: data.wind.speed,
+      });
+
+      speakText(`Current weather in ${data.name}: ${Math.round(data.main.temp)} degrees Celsius, ${data.weather[0].description}`);
+    } catch (err) {
+      console.error("Weather fetch error:", err);
+      setWeather({ error: "Unable to fetch weather data" });
+      speakText("Unable to fetch weather information. Please check your location permissions.");
+    } finally {
+      setWeatherLoading(false);
+    }
+  };
 
   const formatTime = (seconds) =>
     `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
@@ -182,6 +266,126 @@ export default function AIVoiceInput() {
           text-align: center;
           color: #a3a3a3;
           font-size: 1.8rem;
+        }
+
+        .qa-info-section {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 2rem;
+        }
+
+        .qa-time-weather {
+          display: flex;
+          gap: 2rem;
+          background: rgba(17, 24, 39, 0.6);
+          border-radius: 16px;
+          padding: 1.5rem;
+          border: 2px solid #1e3a8a;
+          min-width: 600px;
+        }
+
+        .qa-time-display, .qa-weather-display {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+        }
+
+        .qa-time-icon, .qa-weather-icon {
+          font-size: 3rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 60px;
+          height: 60px;
+          background: rgba(0, 255, 174, 0.1);
+          border-radius: 12px;
+          border: 2px solid #00ffae;
+        }
+
+        .qa-weather-icon img {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+        }
+
+        .qa-time-content, .qa-weather-content {
+          flex: 1;
+        }
+
+        .qa-time-label, .qa-weather-label {
+          font-size: 1.2rem;
+          color: #00ffae;
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+        }
+
+        .qa-time-value {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #fff;
+          font-family: monospace;
+        }
+
+        .qa-date-value {
+          font-size: 1rem;
+          color: #9ca3af;
+          margin-top: 0.25rem;
+        }
+
+        .qa-weather-temp {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #fff;
+          margin-bottom: 0.25rem;
+        }
+
+        .qa-weather-desc {
+          font-size: 1.2rem;
+          color: #00ffae;
+          text-transform: capitalize;
+          margin-bottom: 0.25rem;
+        }
+
+        .qa-weather-city {
+          font-size: 1rem;
+          color: #9ca3af;
+        }
+
+        .qa-weather-loading, .qa-weather-error, .qa-weather-placeholder {
+          font-size: 1.2rem;
+          color: #9ca3af;
+          font-style: italic;
+        }
+
+        .qa-weather-error {
+          color: #ef4444;
+        }
+
+        .qa-weather-btn {
+          background: rgba(0, 255, 174, 0.1);
+          border: 2px solid #00ffae;
+          border-radius: 8px;
+          color: #00ffae;
+          font-size: 1.5rem;
+          padding: 0.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .qa-weather-btn:hover:not(:disabled) {
+          background: rgba(0, 255, 174, 0.2);
+          transform: scale(1.1);
+        }
+
+        .qa-weather-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         .qa-controls {
@@ -403,6 +607,17 @@ export default function AIVoiceInput() {
             font-size: 1.6rem;
             padding: 1.2rem 2.2rem;
           }
+          .qa-time-weather {
+            flex-direction: column;
+            gap: 1rem;
+            min-width: auto;
+          }
+          .qa-time-value {
+            font-size: 1.8rem;
+          }
+          .qa-weather-temp {
+            font-size: 2rem;
+          }
         }
 
         @media (max-width: 480px) {
@@ -446,6 +661,75 @@ export default function AIVoiceInput() {
           <p className="qa-subtitle">
             Speak 🎤 or type 📝 your questions and interact with the AI. Conversation history is below.
           </p>
+
+          {/* Current Time and Weather Section */}
+          <div className="qa-info-section">
+            <div className="qa-time-weather">
+              <div className="qa-time-display">
+                <div className="qa-time-icon">🕐</div>
+                <div className="qa-time-content">
+                  <div className="qa-time-label">Current Time</div>
+                  <div className="qa-time-value">
+                    {currentTime.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    })}
+                  </div>
+                  <div className="qa-date-value">
+                    {currentTime.toLocaleDateString([], {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="qa-weather-display">
+                <div className="qa-weather-icon">
+                  {weatherLoading ? (
+                    '⏳'
+                  ) : weather?.error ? (
+                    '❌'
+                  ) : weather?.icon ? (
+                    <img
+                      src={`http://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+                      alt="Weather icon"
+                      style={{ width: '60px', height: '60px', borderRadius: '12px' }}
+                    />
+                  ) : (
+                    '🌤️'
+                  )}
+                </div>
+                <div className="qa-weather-content">
+                  <div className="qa-weather-label">Weather</div>
+                  {weatherLoading ? (
+                    <div className="qa-weather-loading">Loading weather...</div>
+                  ) : weather?.error ? (
+                    <div className="qa-weather-error">{weather.error}</div>
+                  ) : weather ? (
+                    <div className="qa-weather-info">
+                      <div className="qa-weather-temp">{weather.temperature}°C</div>
+                      <div className="qa-weather-desc">{weather.description}</div>
+                      <div className="qa-weather-city">{weather.city}</div>
+                    </div>
+                  ) : (
+                    <div className="qa-weather-placeholder">Click to get weather</div>
+                  )}
+                </div>
+                <button
+                  onClick={fetchWeather}
+                  disabled={weatherLoading}
+                  className="qa-weather-btn"
+                  title="Get current weather"
+                >
+                  {weatherLoading ? '⏳' : '🔄'}
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div className="qa-controls">
             <button
