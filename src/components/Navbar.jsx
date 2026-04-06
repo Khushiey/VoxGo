@@ -46,7 +46,7 @@ export default function Navbar() {
           cursor: "pointer",
           marginRight: "25px",
           gap: "6px",
-        }}
+        }} 
       > 
         <div style={{ width: "28px", height: "3px", background: "#43e97b", borderRadius: "2px" }}></div>
         <div style={{ width: "28px", height: "3px", background: "#43e97b", borderRadius: "2px" }}></div>
